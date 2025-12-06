@@ -1,0 +1,7 @@
+{
+  "name": "LinguaCompare",
+  "description": "A comprehensive language learning tool focusing on sentence structure comparison, grammar visualization, and A1-A2 certification paths using the Client-First approach.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

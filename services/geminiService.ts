@@ -78,3 +78,17 @@ export const generateComparison = async (sentence: string): Promise<ComparisonSc
     return null;
   }
 };
+
+export const translateText = async (text: string): Promise<string> => {
+    if (!apiKey) return "API Configuration Missing";
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: `Translate the following text into English. If it is already in English, provide a brief definition or grammatical explanation. Keep the response concise (under 30 words) and helpful for a language learner. Text: "${text}"`,
+      });
+      return response.text || "Translation unavailable.";
+    } catch (e) {
+      console.error("Translation error:", e);
+      return "Could not translate text.";
+    }
+  };

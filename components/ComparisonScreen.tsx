@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Play, Settings2, Sparkles, AlertCircle, Book, X, ChevronRight, Layers, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, Settings2, Sparkles, AlertCircle, Book, X, ChevronRight, Layers, Filter, Square } from 'lucide-react';
 import LanguageCard from './LanguageCard';
 import { INITIAL_SCENARIO } from '../constants';
 import { generateComparison } from '../services/geminiService';
 import { ComparisonScenario } from '../types';
 import { PHRASEBOOK, PhraseCategory } from '../data/phrasebook';
+import { SelectionTranslator } from './SelectionTranslator';
 
 const ComparisonScreen: React.FC = () => {
   const [highlightNouns, setHighlightNouns] = useState(false);
@@ -17,6 +18,9 @@ const ComparisonScreen: React.FC = () => {
   
   // Filter State
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('all');
+  
+  // Audio State for Reference
+  const [isPlayingRef, setIsPlayingRef] = useState(false);
   
   // Phrasebook State
   const [isPhrasebookOpen, setIsPhrasebookOpen] = useState(false);
@@ -40,6 +44,25 @@ const ComparisonScreen: React.FC = () => {
         alert("Failed to generate content. Please ensure API Key is configured.");
     }
     setIsGenerating(false);
+  };
+
+  const handlePlayReference = () => {
+    if (isPlayingRef) {
+        window.speechSynthesis.cancel();
+        setIsPlayingRef(false);
+        return;
+    }
+
+    const u = new SpeechSynthesisUtterance(scenario.referenceSentence);
+    u.lang = 'en-US';
+    u.rate = 1.0;
+    
+    u.onstart = () => setIsPlayingRef(true);
+    u.onend = () => setIsPlayingRef(false);
+    u.onerror = () => setIsPlayingRef(false);
+    
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
   };
 
   // Helper to split reference sentence for interactivity
@@ -67,6 +90,9 @@ const ComparisonScreen: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+      {/* Selection Translator Listener */}
+      <SelectionTranslator />
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
@@ -226,9 +252,16 @@ const ComparisonScreen: React.FC = () => {
              )}
           </div>
         </div>
-        <button className="flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-sm transition-all active:scale-95 font-medium whitespace-nowrap">
-          <Play size={20} fill="currentColor" />
-          Play All
+        <button 
+            onClick={handlePlayReference}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg shadow-sm transition-all active:scale-95 font-medium whitespace-nowrap ${
+                isPlayingRef 
+                ? 'bg-red-500 text-white hover:bg-red-600' 
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+        >
+          {isPlayingRef ? <Square size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
+          {isPlayingRef ? 'Stop Audio' : 'Play Reference'}
         </button>
       </div>
 

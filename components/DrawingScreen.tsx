@@ -49,8 +49,23 @@ const DrawingScreen: React.FC = () => {
     useEffect(() => {
         if (canvasRef.current) {
             const canvas = canvasRef.current;
-            canvas.width = canvas.parentElement?.clientWidth || 800;
-            canvas.height = 600;
+            const parent = canvas.parentElement;
+
+            if (parent) {
+                // Calculate dimensions with margins to create a "pad" effect
+                // We subtract 64px to create visible grey space around the "paper"
+                const margin = 64; 
+                canvas.width = Math.max(300, parent.clientWidth - margin);
+                
+                // Ensure height fits but has a minimum usable area
+                // Using parent.clientHeight ensures it fits within the flex container minus margins
+                const calculatedHeight = parent.clientHeight - margin;
+                canvas.height = Math.max(500, calculatedHeight); 
+            } else {
+                canvas.width = 800;
+                canvas.height = 600;
+            }
+
             const ctx = canvas.getContext('2d');
             if (ctx) {
                 ctx.lineCap = 'round';
@@ -173,7 +188,7 @@ const DrawingScreen: React.FC = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8 h-[calc(100vh-4rem)] flex flex-col">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)] flex flex-col">
             <div className="mb-6">
                 <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Character Practice Pad</h1>
                 <p className="text-slate-500 mt-1">Practice writing characters (Kanji, Kana, etc.) with the digital ink tool.</p>
@@ -183,7 +198,7 @@ const DrawingScreen: React.FC = () => {
             <div className="flex-grow flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 
                 {/* Top Toolbar */}
-                <div className="h-16 border-b border-slate-200 bg-slate-50 flex items-center justify-between px-4">
+                <div className="h-16 border-b border-slate-200 bg-slate-50 flex items-center justify-between px-6">
                     
                     <div className="flex items-center gap-4">
                         {/* Tool Group */}
@@ -305,14 +320,14 @@ const DrawingScreen: React.FC = () => {
                 </div>
 
                 {/* Canvas Area (Phase 4.3: CSS Containment) */}
-                <div className="flex-grow bg-slate-100 relative overflow-hidden cursor-crosshair" style={{ contain: 'layout size' }}>
+                <div className="flex-grow bg-slate-100 relative overflow-hidden cursor-crosshair rounded-b-2xl" style={{ contain: 'layout size' }}>
                     <canvas
                         ref={canvasRef}
                         onMouseDown={startDrawing}
                         onMouseMove={draw}
                         onMouseUp={stopDrawing}
                         onMouseLeave={stopDrawing}
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white shadow-sm"
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white shadow-lg rounded-sm"
                     />
                 </div>
             </div>

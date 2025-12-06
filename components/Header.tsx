@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, SplitSquareHorizontal, CalendarCheck, Award, Settings, UserCircle, Layers } from 'lucide-react';
+import { LayoutDashboard, SplitSquareHorizontal, CalendarCheck, Award, Settings, UserCircle, Layers, PenTool, BookOpenText } from 'lucide-react';
 import { View } from '../types';
 
 interface HeaderProps {
@@ -10,9 +10,11 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
     const navItems: { id: View; label: string; icon: React.ReactNode }[] = [
         { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
-        { id: 'compare', label: 'Compare Sentences', icon: <SplitSquareHorizontal size={18} /> },
-        { id: 'routine', label: 'Daily Routine', icon: <CalendarCheck size={18} /> },
-        { id: 'certification', label: 'Certification Path', icon: <Award size={18} /> },
+        { id: 'compare', label: 'Compare', icon: <SplitSquareHorizontal size={18} /> },
+        { id: 'stories', label: 'Stories', icon: <BookOpenText size={18} /> },
+        { id: 'routine', label: 'Routine', icon: <CalendarCheck size={18} /> },
+        { id: 'certification', label: 'Certification', icon: <Award size={18} /> },
+        { id: 'draw', label: 'Draw', icon: <PenTool size={18} /> },
     ];
 
   return (
@@ -59,12 +61,13 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
       </div>
       
       {/* Mobile Nav Bar (Simple visual indication for mobile users) */}
-      <div className="md:hidden flex justify-around border-t border-slate-100 py-2 bg-white">
+      <div className="md:hidden flex justify-around border-t border-slate-100 py-2 bg-white overflow-x-auto">
         {navItems.map((item) => (
              <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`p-2 rounded-lg ${currentView === item.id ? 'bg-blue-50 text-blue-600' : 'text-slate-400'}`}
+                className={`p-2 rounded-lg flex-shrink-0 ${currentView === item.id ? 'bg-blue-50 text-blue-600' : 'text-slate-400'}`}
+                aria-label={item.label}
             >
                 {item.icon}
             </button>

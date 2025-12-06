@@ -3,6 +3,8 @@ import Header from './components/Header';
 import ComparisonScreen from './components/ComparisonScreen';
 import DailyRoutineScreen from './components/DailyRoutineScreen';
 import CertificationScreen from './components/CertificationScreen';
+import DrawingScreen from './components/DrawingScreen';
+import ReadingScreen from './components/ReadingScreen';
 import { View, UserProgress } from './types';
 import { Construction } from 'lucide-react';
 
@@ -65,6 +67,8 @@ const App: React.FC = () => {
         {currentView === 'certification' && 
             <CertificationScreen userProgress={userProgress} />
         }
+        {currentView === 'draw' && <DrawingScreen />}
+        {currentView === 'stories' && <ReadingScreen />}
       </main>
     </div>
   );

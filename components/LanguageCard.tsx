@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2 } from 'lucide-react';
+import { Volume2, BarChart3 } from 'lucide-react';
 import { LanguageData, WordMapping } from '../types';
 import { WORD_TYPE_COLORS } from '../constants';
 
@@ -81,16 +81,39 @@ const LanguageCard: React.FC<LanguageCardProps> = ({ data, highlightNouns, showG
             </div>
         )}
 
-        {/* Difficulty Meter */}
-        <div className="flex items-center gap-3 mt-4">
-          <span className="text-xs font-bold text-slate-400 uppercase">Difficulty</span>
-          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div 
-              className={`h-full rounded-full ${
-                data.difficulty < 40 ? 'bg-green-500' : data.difficulty < 70 ? 'bg-yellow-500' : 'bg-orange-500'
-              }`}
-              style={{ width: `${data.difficulty}%` }}
-            />
+        {/* Segmented Complexity Meter */}
+        <div className="mt-4">
+          <div className="flex justify-between items-end mb-2">
+             <div className="flex items-center gap-2">
+                <BarChart3 size={14} className="text-slate-400" />
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Structural Complexity</span>
+             </div>
+             <span className={`text-xs font-bold ${
+                 data.difficulty < 40 ? 'text-emerald-600' : data.difficulty < 70 ? 'text-amber-600' : 'text-rose-600'
+             }`}>
+                {data.difficulty}%
+             </span>
+          </div>
+          
+          <div className="flex gap-1 h-2">
+            {[...Array(10)].map((_, i) => {
+               // 10 segments representing 10% each
+               const isActive = data.difficulty >= (i * 10) + 1; // 1-10 triggers index 0, 11-20 index 1 etc.
+
+               let activeColorClass = 'bg-slate-200';
+               if (isActive) {
+                    if (i < 4) activeColorClass = 'bg-emerald-400';       // 0-30%
+                    else if (i < 7) activeColorClass = 'bg-amber-400';    // 40-60%
+                    else activeColorClass = 'bg-rose-500';                // 70-100%
+               }
+
+               return (
+                 <div 
+                    key={i} 
+                    className={`flex-1 rounded-full transition-all duration-500 ${isActive ? activeColorClass : 'bg-slate-100'}`}
+                 />
+               )
+            })}
           </div>
         </div>
       </div>

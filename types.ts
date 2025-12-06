@@ -24,7 +24,7 @@ export interface ComparisonScenario {
 }
 
 // Navigation Types
-export type View = 'dashboard' | 'compare' | 'routine' | 'certification';
+export type View = 'dashboard' | 'compare' | 'routine' | 'certification' | 'draw' | 'stories';
 
 // --- Phase 1.2 & 2 Types ---
 

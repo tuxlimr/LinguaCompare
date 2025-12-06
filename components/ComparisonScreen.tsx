@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Settings2, Sparkles, AlertCircle, Book, X, ChevronRight } from 'lucide-react';
+import { Play, Settings2, Sparkles, AlertCircle, Book, X, ChevronRight, Layers, Filter } from 'lucide-react';
 import LanguageCard from './LanguageCard';
 import { INITIAL_SCENARIO } from '../constants';
 import { generateComparison } from '../services/geminiService';
@@ -14,6 +14,9 @@ const ComparisonScreen: React.FC = () => {
   const [promptInput, setPromptInput] = useState("");
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
+  // Filter State
+  const [selectedLanguageId, setSelectedLanguageId] = useState<string>('all');
   
   // Phrasebook State
   const [isPhrasebookOpen, setIsPhrasebookOpen] = useState(false);
@@ -31,6 +34,8 @@ const ComparisonScreen: React.FC = () => {
       setScenario(newScenario);
       setIsInputOpen(false);
       setPromptInput("");
+      // Reset filter to all when new content arrives, or keep it? Let's reset to ensure they see everything first.
+      setSelectedLanguageId('all');
     } else {
         alert("Failed to generate content. Please ensure API Key is configured.");
     }
@@ -54,6 +59,11 @@ const ComparisonScreen: React.FC = () => {
       </span>
     ));
   };
+
+  // Filter languages based on selection
+  const displayedLanguages = selectedLanguageId === 'all' 
+    ? scenario.languages 
+    : scenario.languages.filter(l => l.id === selectedLanguageId);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
@@ -202,7 +212,7 @@ const ComparisonScreen: React.FC = () => {
       )}
 
       {/* Reference Sentence Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex-1">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Reference Sentence (English)</h2>
           <div className="text-2xl font-semibold flex flex-wrap items-center">
@@ -222,9 +232,41 @@ const ComparisonScreen: React.FC = () => {
         </button>
       </div>
 
-      {/* Language Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {/* Language Filter Tabs */}
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar">
+        <div className="flex items-center text-xs font-bold text-slate-400 uppercase tracking-wider mr-2">
+            <Filter size={14} className="mr-1" /> View:
+        </div>
+        <button
+            onClick={() => setSelectedLanguageId('all')}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                selectedLanguageId === 'all'
+                ? 'bg-slate-800 text-white shadow-md'
+                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+            }`}
+        >
+            <Layers size={14} />
+            All Languages
+        </button>
         {scenario.languages.map((lang) => (
+            <button
+                key={lang.id}
+                onClick={() => setSelectedLanguageId(lang.id)}
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                    selectedLanguageId === lang.id
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                }`}
+            >
+                <span>{lang.flag}</span>
+                {lang.language}
+            </button>
+        ))}
+      </div>
+
+      {/* Language Grid */}
+      <div className={`grid gap-6 ${selectedLanguageId === 'all' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 max-w-3xl mx-auto'}`}>
+        {displayedLanguages.map((lang) => (
           <LanguageCard 
             key={lang.id} 
             data={lang} 
